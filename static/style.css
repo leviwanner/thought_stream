@@ -64,8 +64,14 @@ button:hover {
   padding-bottom: 80px;
   font-size: 18px;
   line-height: 1.6;
-  overflow-wrap: anywhere;
-  word-break: normal;
+  word-break: break-all;
+  overflow-wrap: break-word; /* Added for better compatibility */
+}
+
+.thought a {
+  /* Apply rules specifically to links inside a thought */
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .thought-date {

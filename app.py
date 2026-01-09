@@ -20,7 +20,6 @@ auth = HTTPBasicAuth()
 
 # --- Constants ---
 THOUGHTS_FILE = 'thoughts.json'
-VAPID_KEYS_FILE = 'vapid_keys.json'
 SUBSCRIPTION_FILE = 'subscription.json'
 PAGE_SIZE = 10
 
@@ -57,10 +56,6 @@ def get_subscription():
 def save_subscription(subscription):
     with open(SUBSCRIPTION_FILE, 'w') as f:
         json.dump(subscription, f, indent=4)
-
-def get_vapid_keys():
-    with open(VAPID_KEYS_FILE, 'r') as f:
-        return json.load(f)
 
 # --- Core Routes ---
 @app.route('/')
@@ -106,14 +101,10 @@ def add_thought():
         subscription = get_subscription()
         if subscription:
             try:
-                vapid_keys = get_vapid_keys()
-                # Decode the base64 private key before using it
-                private_key_bytes = base64.b64decode(vapid_keys['private_key'])
-                
                 webpush(
                     subscription_info=subscription,
                     data=json.dumps({'title': 'New Thought!', 'body': thought_text}).encode('utf-8'),
-                    vapid_private_key=private_key_bytes,
+                    vapid_private_key="vapid_private.pem",
                     vapid_claims={'sub': os.environ.get('VAPID_CLAIMS_EMAIL', 'mailto:your-email@example.com')}
                 )
             except WebPushException as ex:
@@ -166,8 +157,9 @@ def upload_image():
 @app.route('/vapid_public_key', methods=['GET'])
 @auth.login_required
 def vapid_public_key():
-    keys = get_vapid_keys()
-    return jsonify({'public_key': keys['public_key_b64']})
+    with open('vapid_public.txt', 'r') as f:
+        public_key = f.read().strip()
+    return jsonify({'public_key': public_key})
 
 @app.route('/subscription', methods=['POST'])
 @auth.login_required

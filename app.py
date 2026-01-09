@@ -112,7 +112,7 @@ def add_thought():
                 
                 webpush(
                     subscription_info=subscription,
-                    data=json.dumps({'title': 'New Thought!', 'body': thought_text}),
+                    data=json.dumps({'title': 'New Thought!', 'body': thought_text}).encode('utf-8'),
                     vapid_private_key=private_key_bytes,
                     vapid_claims={'sub': os.environ.get('VAPID_CLAIMS_EMAIL', 'mailto:your-email@example.com')}
                 )

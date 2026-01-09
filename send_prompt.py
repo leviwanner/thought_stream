@@ -54,7 +54,7 @@ def send_prompt():
 
         webpush(
             subscription_info=subscription_info,
-            data=PUSH_DATA,
+            data=PUSH_DATA.encode('utf-8'),
             vapid_private_key=private_key_bytes,
             vapid_claims=vapid_claims
         )

@@ -18,7 +18,7 @@ SUBSCRIPTION_FILE = os.path.join(project_root, 'subscription.json')
 
 # Notification content
 PUSH_DATA = json.dumps({
-    'title': 'Thought Stream',
+    'title': 'Thought Reminder',
     'body': "What's on your mind?"
 })
 

@@ -10,5 +10,6 @@ venv/
 vapid_keys.json
 subscription.json
 thoughts.json
+.env
 private_key.pem
 static/uploads/

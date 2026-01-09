@@ -8,6 +8,10 @@ from flask_httpauth import HTTPBasicAuth
 from werkzeug.utils import secure_filename
 from pywebpush import webpush, WebPushException
 from PIL import Image
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # --- App and Auth Initialization ---
 app = Flask(__name__)
@@ -23,7 +27,7 @@ PAGE_SIZE = 10
 # IMPORTANT: Change this username and password.
 # For better security, use environment variables.
 USERS = {
-    "admin": "secret"
+    os.environ.get("APP_USERNAME", "admin"): os.environ.get("APP_PASSWORD", "secret")
 }
 
 @auth.verify_password
@@ -106,7 +110,7 @@ def add_thought():
                     subscription_info=subscription,
                     data=json.dumps({'title': 'New Thought!', 'body': thought_text}),
                     vapid_private_key=vapid_keys['private_key'],
-                    vapid_claims={'sub': 'mailto:your_email@example.com'}
+                    vapid_claims={'sub': os.environ.get('VAPID_CLAIMS_EMAIL', 'mailto:your-email@example.com')}
                 )
             except WebPushException as ex:
                 print(f"Web push failed: {ex}")

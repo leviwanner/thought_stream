@@ -2,3 +2,4 @@ Flask
 pywebpush
 Flask-HTTPAuth
 Pillow
+python-dotenv

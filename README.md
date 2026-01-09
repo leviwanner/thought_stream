@@ -40,7 +40,30 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Generate VAPID Keys
+### 4. Configure Environment Variables
+
+The application uses a `.env` file to manage sensitive configurations like your username, password, and the VAPID claims email for push notifications. This keeps your secrets out of the code and Git repository.
+
+1.  **Create your `.env` file:**
+    ```bash
+    cp .env.example .env
+    ```
+
+2.  **Edit the `.env` file:**
+    ```bash
+    nano .env
+    ```
+    Replace the placeholder values with your desired username, a strong password, and a valid email address (e.g., `mailto:your-email@example.com` or `https://your-website.com`) for the `VAPID_CLAIMS_EMAIL`.
+
+    Example `.env` content:
+    ```
+    APP_USERNAME=mysecureuser
+    APP_PASSWORD=My$uper$ecureP@ssw0rd!
+    VAPID_CLAIMS_EMAIL=mailto:my.contact@example.com
+    ```
+    Save and exit (`Ctrl+X`, then `Y`, then `Enter`).
+
+### 5. Generate VAPID Keys
 
 The application uses VAPID keys for push notifications. You need to generate these keys once.
 

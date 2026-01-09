@@ -97,26 +97,42 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function subscribeToPush() {
-    const response = await fetch("/vapid_public_key");
-    const data = await response.json();
-    const publicKey = data.public_key;
+    console.log('Attempting to subscribe to push notifications...');
+    
+    try {
+        console.log('Fetching VAPID public key...');
+        const response = await fetch('/vapid_public_key');
+        const data = await response.json();
+        const publicKey = data.public_key;
+        console.log('Successfully fetched VAPID public key.');
 
-    navigator.serviceWorker.ready.then((registration) => {
-      registration.pushManager
-        .subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(publicKey),
-        })
-        .then((subscription) => {
-          fetch("/subscription", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(subscription),
-          });
+        const applicationServerKey = urlBase64ToUint8Array(publicKey);
+        console.log('Converted public key.');
+
+        console.log('Waiting for service worker to be ready...');
+        const registration = await navigator.serviceWorker.ready;
+        console.log('Service worker is ready.');
+
+        console.log('Subscribing push manager... (This should trigger the permission pop-up)');
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: applicationServerKey
         });
-    });
+        console.log('Successfully subscribed:', subscription);
+
+        console.log('Sending subscription to server...');
+        await fetch('/subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(subscription)
+        });
+        console.log('Subscription sent to server.');
+        alert('Successfully subscribed to notifications!');
+
+    } catch (error) {
+        console.error('Failed to subscribe to push notifications:', error);
+        alert(`Subscription failed. Please check the console for details. Error: ${error.name}`);
+    }
   }
 
   // Helper function to convert base64 string to Uint8Array

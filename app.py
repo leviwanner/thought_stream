@@ -97,18 +97,18 @@ def add_thought():
         thoughts.insert(0, new_thought)
         save_thoughts(thoughts)
 
-        # Send push notification
-        subscription = get_subscription()
-        if subscription:
-            try:
-                webpush(
-                    subscription_info=subscription,
-                    data=json.dumps({'title': 'New Thought!', 'body': thought_text}).encode('utf-8'),
-                    vapid_private_key="vapid_private.pem",
-                    vapid_claims={'sub': os.environ.get('VAPID_CLAIMS_EMAIL', 'mailto:your-email@example.com')}
-                )
-            except WebPushException as ex:
-                print(f"Web push failed: {ex}")
+        # Notification on new thought has been disabled as per user request.
+        # subscription = get_subscription()
+        # if subscription:
+        #     try:
+        #         webpush(
+        #             subscription_info=subscription,
+        #             data=json.dumps({'title': 'New Thought!', 'body': thought_text}).encode('utf-8'),
+        #             vapid_private_key="vapid_private.pem",
+        #             vapid_claims={'sub': os.environ.get('VAPID_CLAIMS_EMAIL', 'mailto:your-email@example.com')}
+        #         )
+        #     except WebPushException as ex:
+        #         print(f"Web push failed: {ex}")
 
         return jsonify({'status': 'ok'}), 201
     return jsonify({'error': 'Invalid thought'}), 400

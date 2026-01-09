@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log('Successfully fetched VAPID public key.');
 
         const applicationServerKey = urlBase64ToUint8Array(publicKey);
-        console.log('Converted public key.');
+        console.log('Final applicationServerKey to be used:', applicationServerKey);
 
         console.log('Waiting for service worker to be ready...');
         const registration = await navigator.serviceWorker.ready;

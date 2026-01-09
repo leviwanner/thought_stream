@@ -2,6 +2,7 @@ import json
 import os
 import math
 import uuid
+import base64
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from flask_httpauth import HTTPBasicAuth
@@ -106,10 +107,13 @@ def add_thought():
         if subscription:
             try:
                 vapid_keys = get_vapid_keys()
+                # Decode the base64 private key before using it
+                private_key_bytes = base64.b64decode(vapid_keys['private_key'])
+                
                 webpush(
                     subscription_info=subscription,
                     data=json.dumps({'title': 'New Thought!', 'body': thought_text}),
-                    vapid_private_key=vapid_keys['private_key'],
+                    vapid_private_key=private_key_bytes,
                     vapid_claims={'sub': os.environ.get('VAPID_CLAIMS_EMAIL', 'mailto:your-email@example.com')}
                 )
             except WebPushException as ex:

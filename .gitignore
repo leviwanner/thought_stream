@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env
+
+# Application Data (Important for security and state)
+vapid_keys.json
+subscription.json
+thoughts.json
+private_key.pem

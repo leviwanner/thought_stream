@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thought Stream</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="manifest"
+      href="{{ url_for('static', filename='manifest.json') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Thought Stream</h1>
+      <div class="form-container">
+        <input
+          type="text"
+          id="thought-input"
+          placeholder="What's on your mind?"
+        />
+        <button id="submit-thought">Share</button>
+      </div>
+      <div id="feed"></div>
+
+      <div class="pagination-container">
+        <button id="older-thoughts" style="display: none">Older</button>
+        <button id="newer-thoughts" style="display: none">Newer</button>
+      </div>
+
+      <button id="subscribe">Subscribe to Notifications</button>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

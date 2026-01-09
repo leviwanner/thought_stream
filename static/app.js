@@ -17,14 +17,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function isImageUrl(url) {
     if (typeof url !== "string") return false;
-    try {
-      const path = new URL(url).pathname;
-      if (path.match(/\.(jpeg|jpg|gif|png|webp|avif)$/i)) {
-        return true;
-      }
-    } catch (e) {
-      // Not a valid URL
+
+    // This check handles both absolute and relative URLs that end in an image extension
+    if (url.match(/\.(jpeg|jpg|gif|png|webp|avif)$/i)) {
+      return true;
     }
+
+    // This handles special cases like Twitter that use query parameters for format
     if (url.includes("format=jpg") || url.includes("format=png")) {
       return true;
     }
@@ -59,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const dateElement = document.createElement("span");
       dateElement.classList.add("thought-date");
-      const date = new Date(thought.timestamp + "Z");
+      const date = new Date(thought.timestamp); // FIX: Removed the extra '+ "Z"'
       dateElement.textContent = date.toLocaleDateString("en-US", {
         month: "long",
         day: "numeric",
@@ -135,6 +134,45 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return outputArray;
   }
+
+
+  thoughtInput.addEventListener('paste', async (e) => {
+    // Check if pasted items contain an image
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    let imageFile = null;
+    for (const item of items) {
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+            imageFile = item.getAsFile();
+            break;
+        }
+    }
+
+    if (imageFile) {
+        e.preventDefault(); // Prevent pasting file name as text
+        thoughtInput.placeholder = "Uploading image..."; // Provide feedback
+
+        const formData = new FormData();
+        formData.append('file', imageFile);
+
+        try {
+            const response = await fetch('/upload_image', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Upload failed');
+            }
+
+            const data = await response.json();
+            thoughtInput.value = data.url; // Set textarea value to the new image URL
+            thoughtInput.placeholder = "What's on your mind?";
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            thoughtInput.placeholder = "Upload failed. Please try again.";
+        }
+    }
+  });
 
   // Event Listeners
   submitButton.addEventListener("click", postThought);

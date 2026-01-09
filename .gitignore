@@ -11,3 +11,4 @@ vapid_keys.json
 subscription.json
 thoughts.json
 private_key.pem
+static/uploads/

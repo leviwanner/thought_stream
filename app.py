@@ -168,6 +168,10 @@ def subscription():
     save_subscription(subscription_data)
     return jsonify({'status': 'ok'})
 
+@app.route('/sw.js')
+def service_worker():
+    return app.send_static_file('sw.js')
+
 # --- Main Execution ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -199,19 +199,51 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial Load
   getThoughts(1);
 
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/sw.js").then(
-        (registration) => {
-          console.log(
-            "ServiceWorker registration successful with scope: ",
-            registration.scope
-          );
-        },
-        (err) => {
-          console.log("ServiceWorker registration failed: ", err);
-        }
-      );
-    });
+  function handleAppUpdates() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(reg => {
+        console.log('ServiceWorker registration successful with scope: ', reg.scope);
+
+        // This function checks for a new waiting service worker
+        const checkForUpdate = () => {
+          if (reg.waiting) {
+            const refreshLink = document.getElementById('refresh-app');
+            refreshLink.style.display = 'block'; // Show the refresh link
+
+            refreshLink.addEventListener('click', (e) => {
+              e.preventDefault();
+              reg.waiting.postMessage({ action: 'skipWaiting' });
+            });
+          }
+        };
+
+        // Check immediately
+        checkForUpdate();
+
+        // Listen for new updates
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed') {
+              // A new worker is installed and waiting, check again
+              checkForUpdate();
+            }
+          });
+        });
+      }).catch(err => {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+
+      // Reload the page once a new service worker has taken control
+      let refreshing;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        window.location.reload();
+        refreshing = true;
+      });
+    }
   }
+
+  // Handle app updates
+  handleAppUpdates();
 });

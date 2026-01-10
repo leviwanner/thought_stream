@@ -118,3 +118,15 @@ button:hover {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.footer-link {
+  display: block;
+  margin: 20px auto 0;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #007aff; /* A standard blue link color */
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: center;
+}

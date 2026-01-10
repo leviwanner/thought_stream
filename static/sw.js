@@ -15,6 +15,12 @@ self.addEventListener('install', event => {
     );
 });
 
+self.addEventListener('message', event => {
+    if (event.data && event.data.action === 'skipWaiting') {
+        self.skipWaiting();
+    }
+});
+
 self.addEventListener('push', event => {
     const data = event.data.json();
     self.registration.showNotification(data.title, {

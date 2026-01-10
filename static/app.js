@@ -31,48 +31,65 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function getThoughts(page = 1) {
-    const response = await fetch(`/thoughts?page=${page}`);
-    const data = await response.json();
+    try {
+      const response = await fetch(`/thoughts?page=${page}`);
 
-    feed.innerHTML = "";
-    data.thoughts.forEach((thought) => {
-      const thoughtElement = document.createElement("div");
-      thoughtElement.classList.add("thought");
-
-      const content = thought.text.trim();
-      if (isImageUrl(content)) {
-        const anchorElement = document.createElement("a");
-        anchorElement.href = content;
-        anchorElement.target = "_blank";
-        anchorElement.rel = "noopener noreferrer"; // Security best practice
-        const imageElement = document.createElement("img");
-        imageElement.src = content;
-        imageElement.classList.add("thought-image");
-        anchorElement.appendChild(imageElement);
-        thoughtElement.appendChild(anchorElement);
-      } else {
-        const textContainer = document.createElement("span"); // Use a container to hold innerHTML
-        textContainer.innerHTML = linkify(thought.text); // Use innerHTML to render links
-        thoughtElement.appendChild(textContainer);
+      // Check if the server responded with an authorization error
+      if (response.status === 401) {
+        // Redirect to the login page if the session is invalid
+        window.location.href = '/login';
+        return;
       }
 
-      const dateElement = document.createElement("span");
-      dateElement.classList.add("thought-date");
-      const date = new Date(thought.timestamp); // FIX: Removed the extra '+ "Z"'
-      dateElement.textContent = date.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+
+      feed.innerHTML = "";
+      data.thoughts.forEach((thought) => {
+        const thoughtElement = document.createElement("div");
+        thoughtElement.classList.add("thought");
+
+        const content = thought.text.trim();
+        if (isImageUrl(content)) {
+          const anchorElement = document.createElement("a");
+          anchorElement.href = content;
+          anchorElement.target = "_blank";
+          anchorElement.rel = "noopener noreferrer";
+          const imageElement = document.createElement("img");
+          imageElement.src = content;
+          imageElement.classList.add("thought-image");
+          anchorElement.appendChild(imageElement);
+          thoughtElement.appendChild(anchorElement);
+        } else {
+          const textContainer = document.createElement("span");
+          textContainer.innerHTML = linkify(thought.text);
+          thoughtElement.appendChild(textContainer);
+        }
+
+        const dateElement = document.createElement("span");
+        dateElement.classList.add("thought-date");
+        const date = new Date(thought.timestamp);
+        dateElement.textContent = date.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        thoughtElement.appendChild(dateElement);
+        feed.appendChild(thoughtElement);
       });
 
-      thoughtElement.appendChild(dateElement);
-      feed.appendChild(thoughtElement);
-    });
-
-    // Update pagination button visibility
-    olderButton.style.display = data.has_next ? "block" : "none";
-    newerButton.style.display = data.has_prev ? "block" : "none";
-    currentPage = data.page;
+      // Update pagination button visibility
+      olderButton.style.display = data.has_next ? "block" : "none";
+      newerButton.style.display = data.has_prev ? "block" : "none";
+      currentPage = data.page;
+    } catch (error) {
+      console.error("Failed to fetch thoughts:", error);
+      feed.innerHTML = "<p>Could not load thoughts. Please try refreshing.</p>";
+    }
   }
 
   async function postThought() {

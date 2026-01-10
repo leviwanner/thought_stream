@@ -6,6 +6,7 @@ import base64
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_session import Session
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from pywebpush import webpush, WebPushException
@@ -18,6 +19,11 @@ load_dotenv()
 # --- App and Auth Initialization ---
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'default-secret-key-please-change')
+
+# Configure server-side sessions
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_FILE_DIR'] = './flask_session'
+Session(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)

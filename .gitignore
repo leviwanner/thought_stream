@@ -5,8 +5,7 @@ __pycache__/
 *.pyd
 venv/
 .env
-
-# Application Data (Important for security and state)
+flask_session/
 vapid_private.pem
 vapid_public.txt
 subscription.json

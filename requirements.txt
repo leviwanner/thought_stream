@@ -1,5 +1,6 @@
 Flask
 pywebpush
 Flask-Login
+Flask-Session
 Pillow
 python-dotenv

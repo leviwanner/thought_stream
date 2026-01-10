@@ -32,7 +32,7 @@ a {
 
 #thought-input,
 #submit-thought,
-.pagination-container button {
+#pagination-container button {
   height: 45px;
   padding: 8px 15px;
   font-size: 14px;
@@ -53,9 +53,34 @@ button {
   transition: background-color 0.2s, color 0.2s;
 }
 
-button:hover {
-  background: #000;
-  color: #fff;
+/* --- Login --- */
+
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 80px;
+}
+
+#username,
+#password,
+#submit {
+  height: 45px;
+  padding: 8px 15px;
+  font-size: 14px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  background: #fff;
+  color: #000;
+}
+
+#username,
+#password {
+  flex: 1;
+  resize: vertical;
+  box-sizing: border-box;
+  width: 400px;
 }
 
 /* --- Feed --- */
@@ -96,7 +121,7 @@ button:hover {
 
 /* --- Pagination --- */
 
-.pagination-container {
+#pagination-container {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
@@ -110,12 +135,12 @@ button:hover {
 .footer-actions {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 0.5rem;
   margin-top: 40px;
 }
 
 #subscribe,
-.footer-link {
+#refresh-app {
   background: none;
   border: none;
   font-size: 14px;
@@ -125,6 +150,14 @@ button:hover {
   padding: 0;
 }
 
-.footer-link {
-  color: #007aff; /* Keep the blue color for the update link */
+#subscribe:hover,
+#refresh-app:hover {
+  background: none;
+}
+
+#submit-thought:hover,
+#pagination-container button:hover,
+#submit:hover {
+  background: #000;
+  color: #fff;
 }

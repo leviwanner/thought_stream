@@ -97,41 +97,47 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function subscribeToPush() {
-    console.log('Attempting to subscribe to push notifications...');
-    
+    console.log("Attempting to subscribe to push notifications...");
+
     try {
-        console.log('Fetching VAPID public key...');
-        const response = await fetch('/vapid_public_key');
-        const data = await response.json();
-        const publicKey = data.public_key;
-        console.log('Successfully fetched VAPID public key.');
+      console.log("Fetching VAPID public key...");
+      const response = await fetch("/vapid_public_key");
+      const data = await response.json();
+      const publicKey = data.public_key;
+      console.log("Successfully fetched VAPID public key.");
 
-        const applicationServerKey = urlBase64ToUint8Array(publicKey);
-        console.log('Final applicationServerKey to be used:', applicationServerKey);
+      const applicationServerKey = urlBase64ToUint8Array(publicKey);
+      console.log(
+        "Final applicationServerKey to be used:",
+        applicationServerKey
+      );
 
-        console.log('Waiting for service worker to be ready...');
-        const registration = await navigator.serviceWorker.ready;
-        console.log('Service worker is ready.');
+      console.log("Waiting for service worker to be ready...");
+      const registration = await navigator.serviceWorker.ready;
+      console.log("Service worker is ready.");
 
-        console.log('Subscribing push manager... (This should trigger the permission pop-up)');
-        const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: applicationServerKey
-        });
-        console.log('Successfully subscribed:', subscription);
+      console.log(
+        "Subscribing push manager... (This should trigger the permission pop-up)"
+      );
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey,
+      });
+      console.log("Successfully subscribed:", subscription);
 
-        console.log('Sending subscription to server...');
-        await fetch('/subscription', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(subscription)
-        });
-        console.log('Subscription sent to server.');
-        alert('Successfully subscribed to notifications!');
-
+      console.log("Sending subscription to server...");
+      await fetch("/subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subscription),
+      });
+      console.log("Subscription sent to server.");
+      alert("Successfully subscribed to notifications!");
     } catch (error) {
-        console.error('Failed to subscribe to push notifications:', error);
-        alert(`Subscription failed. Please check the console for details. Error: ${error.name}`);
+      console.error("Failed to subscribe to push notifications:", error);
+      alert(
+        `Subscription failed. Please check the console for details. Error: ${error.name}`
+      );
     }
   }
 
@@ -151,70 +157,75 @@ document.addEventListener("DOMContentLoaded", () => {
     return outputArray;
   }
 
-
-  thoughtInput.addEventListener('paste', async (e) => {
+  thoughtInput.addEventListener("paste", async (e) => {
     // Check if pasted items contain an image
     const items = (e.clipboardData || e.originalEvent.clipboardData).items;
     let imageFile = null;
     for (const item of items) {
-        if (item.kind === 'file' && item.type.startsWith('image/')) {
-            imageFile = item.getAsFile();
-            break;
-        }
+      if (item.kind === "file" && item.type.startsWith("image/")) {
+        imageFile = item.getAsFile();
+        break;
+      }
     }
 
     if (imageFile) {
-        e.preventDefault(); // Prevent pasting file name as text
-        thoughtInput.placeholder = "Uploading image..."; // Provide feedback
+      e.preventDefault(); // Prevent pasting file name as text
+      thoughtInput.placeholder = "Uploading image..."; // Provide feedback
 
-        const formData = new FormData();
-        formData.append('file', imageFile);
+      const formData = new FormData();
+      formData.append("file", imageFile);
 
-        try {
-            const response = await fetch('/upload_image', {
-                method: 'POST',
-                body: formData,
-            });
+      try {
+        const response = await fetch("/upload_image", {
+          method: "POST",
+          body: formData,
+        });
 
-            if (!response.ok) {
-                throw new Error('Upload failed');
-            }
-
-            const data = await response.json();
-            thoughtInput.value = data.url; // Set textarea value to the new image URL
-            thoughtInput.placeholder = "What's on your mind?";
-        } catch (error) {
-            console.error('Error uploading image:', error);
-            thoughtInput.placeholder = "Upload failed. Please try again.";
+        if (!response.ok) {
+          throw new Error("Upload failed");
         }
+
+        const data = await response.json();
+        thoughtInput.value = data.url; // Set textarea value to the new image URL
+        thoughtInput.placeholder = "What's on your mind?";
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        thoughtInput.placeholder = "Upload failed. Please try again.";
+      }
     }
   });
 
-  const refreshButton = document.getElementById('refresh-app');
+  const refreshButton = document.getElementById("refresh-app");
   let newWorker;
 
   // --- PWA Update Handling ---
   function handleAppUpdates() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').then(reg => {
-        reg.addEventListener('updatefound', () => {
-          // A new service worker is installing
-          newWorker = reg.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // New service worker is installed and waiting.
-              // Update the UI to notify the user.
-              refreshButton.textContent = 'New version available. Refresh!';
-            }
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((reg) => {
+          reg.addEventListener("updatefound", () => {
+            // A new service worker is installing
+            newWorker = reg.installing;
+            newWorker.addEventListener("statechange", () => {
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                // New service worker is installed and waiting.
+                // Update the UI to notify the user.
+                refreshButton.textContent = "New version available. Refresh!";
+              }
+            });
           });
+        })
+        .catch((err) => {
+          console.log("ServiceWorker registration failed: ", err);
         });
-      }).catch(err => {
-        console.log('ServiceWorker registration failed: ', err);
-      });
 
       // Reload the page once a new service worker has taken control
       let refreshing;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
         if (refreshing) return;
         window.location.reload(true);
         refreshing = true;
@@ -227,18 +238,17 @@ document.addEventListener("DOMContentLoaded", () => {
   olderButton.addEventListener("click", showOlder);
   newerButton.addEventListener("click", showNewer);
   subscribeButton.addEventListener("click", subscribeToPush);
-  
-  refreshButton.addEventListener('click', (e) => {
+
+  refreshButton.addEventListener("click", (e) => {
     e.preventDefault();
     if (newWorker) {
       // If a new worker is waiting, tell it to skip waiting
-      newWorker.postMessage({ action: 'skipWaiting' });
+      newWorker.postMessage({ action: "skipWaiting" });
     } else {
       // Otherwise, just perform a hard reload
       window.location.reload(true);
     }
   });
-
 
   // --- Initial Load ---
   getThoughts(1);

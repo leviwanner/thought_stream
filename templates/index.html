@@ -34,8 +34,10 @@
         <button id="newer-thoughts" style="display: none">Newer</button>
       </div>
 
-      <button id="subscribe">Subscribe to Notifications</button>
-      <a href="#" id="refresh-app" class="footer-link" style="display: none;">A new version is available. Refresh.</a>
+      <div class="footer-actions">
+        <button id="subscribe">Subscribe</button>
+        <a href="#" id="refresh-app" class="footer-link">Refresh</a>
+      </div>
     </div>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
   </body>

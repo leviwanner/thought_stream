@@ -106,27 +106,25 @@ button:hover {
   margin-left: auto;
 }
 
-/* --- Subscribe --- */
+/* --- Footer Actions (Subscribe and Refresh) --- */
+.footer-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 40px;
+}
 
-#subscribe {
-  display: block;
-  margin: 40px auto;
+#subscribe,
+.footer-link {
   background: none;
   border: none;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.25);
+  color: rgba(0, 0, 0, 0.4);
   text-decoration: underline;
   cursor: pointer;
+  padding: 0;
 }
 
 .footer-link {
-  display: block;
-  margin: 20px auto 0;
-  background: none;
-  border: none;
-  font-size: 14px;
-  color: #007aff; /* A standard blue link color */
-  text-decoration: underline;
-  cursor: pointer;
-  text-align: center;
+  color: #007aff; /* Keep the blue color for the update link */
 }

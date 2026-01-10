@@ -190,43 +190,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Event Listeners
-  submitButton.addEventListener("click", postThought);
-  olderButton.addEventListener("click", showOlder);
-  newerButton.addEventListener("click", showNewer);
-  subscribeButton.addEventListener("click", subscribeToPush);
+  const refreshButton = document.getElementById('refresh-app');
+  let newWorker;
 
-  // Initial Load
-  getThoughts(1);
-
+  // --- PWA Update Handling ---
   function handleAppUpdates() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(reg => {
-        console.log('ServiceWorker registration successful with scope: ', reg.scope);
-
-        // This function checks for a new waiting service worker
-        const checkForUpdate = () => {
-          if (reg.waiting) {
-            const refreshLink = document.getElementById('refresh-app');
-            refreshLink.style.display = 'block'; // Show the refresh link
-
-            refreshLink.addEventListener('click', (e) => {
-              e.preventDefault();
-              reg.waiting.postMessage({ action: 'skipWaiting' });
-            });
-          }
-        };
-
-        // Check immediately
-        checkForUpdate();
-
-        // Listen for new updates
         reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
+          // A new service worker is installing
+          newWorker = reg.installing;
           newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed') {
-              // A new worker is installed and waiting, check again
-              checkForUpdate();
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New service worker is installed and waiting.
+              // Update the UI to notify the user.
+              refreshButton.textContent = 'New version available. Refresh!';
             }
           });
         });
@@ -238,12 +216,31 @@ document.addEventListener("DOMContentLoaded", () => {
       let refreshing;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (refreshing) return;
-        window.location.reload();
+        window.location.reload(true);
         refreshing = true;
       });
     }
   }
 
-  // Handle app updates
+  // --- Event Listeners ---
+  submitButton.addEventListener("click", postThought);
+  olderButton.addEventListener("click", showOlder);
+  newerButton.addEventListener("click", showNewer);
+  subscribeButton.addEventListener("click", subscribeToPush);
+  
+  refreshButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (newWorker) {
+      // If a new worker is waiting, tell it to skip waiting
+      newWorker.postMessage({ action: 'skipWaiting' });
+    } else {
+      // Otherwise, just perform a hard reload
+      window.location.reload(true);
+    }
+  });
+
+
+  // --- Initial Load ---
+  getThoughts(1);
   handleAppUpdates();
 });

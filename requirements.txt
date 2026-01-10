@@ -1,5 +1,5 @@
 Flask
 pywebpush
-Flask-HTTPAuth
+Flask-Login
 Pillow
 python-dotenv

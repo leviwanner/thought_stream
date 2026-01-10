@@ -58,9 +58,12 @@ button {
 .login {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
   gap: 0.5rem;
   margin-bottom: 80px;
+}
+
+.login div {
+  width: 100%;
 }
 
 #username,
@@ -80,7 +83,7 @@ button {
   flex: 1;
   resize: vertical;
   box-sizing: border-box;
-  width: 400px;
+  width: 100%;
 }
 
 /* --- Feed --- */
